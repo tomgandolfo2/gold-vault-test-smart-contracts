@@ -15,8 +15,8 @@ contract Gold {
     uint256 public sharePrice = 1e18;
     // -- Events --
     // -- Modifiers --
-    modifier ownlyOwner() {
-        require(msg.sender == i_owner, "Ownly owner can call this function");
+    modifier onlyOwner() {
+        require(msg.sender == i_owner, "Only owner can call this function");
         _;
     }
 
@@ -51,8 +51,21 @@ contract Gold {
         (bool success, ) = address(this).call{value: _shareAmount * sharePrice}(
             ""
         );
-        require(success, "Failed deposit");
+        require(success, "Failed purchase");
         s_balance[msg.sender] += _shareAmount * sharePrice;
+    }
+
+    function sellShare(uint256 _shareAmount) public payable {
+        require(s_balance[msg.sender] >= _shareAmount * sharePrice, "Not enough shares");
+        (bool success, ) = payable(msg.sender).call{value: _shareAmount * sharePrice}(
+            ""
+        );
+        require(success, "Failed sale");
+        s_balance[msg.sender] -= _shareAmount * sharePrice;
+    }
+
+    function destroy() public onlyOwner {
+        selfdestruct(payable(i_owner));
     }
     //     -- Internal
     //     -- Private
