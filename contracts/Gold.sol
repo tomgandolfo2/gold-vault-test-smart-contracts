@@ -16,7 +16,7 @@ contract Gold {
     // -- Events --
     // -- Modifiers --
     modifier onlyOwner() {
-        require(msg.sender == i_owner, "Only owner can call this function");
+        require(i_owner == payable(msg.sender), "Only owner can call this function");
         _;
     }
 
@@ -62,10 +62,6 @@ contract Gold {
         );
         require(success, "Failed sale");
         s_balance[msg.sender] -= _shareAmount * sharePrice;
-    }
-
-    function destroy() public onlyOwner {
-        selfdestruct(payable(i_owner));
     }
     //     -- Internal
     //     -- Private
